@@ -6,7 +6,7 @@
 #Insert a heading line as follows: "Name Phone Number Jan Feb Mar", and output the resulting data to a file called move1.txt
 sed '1s/^/Name Phone Number Jan Feb Mar\n/'  $1  > move1.txt 
 
-#Duplicate the file from arguments to a new file called move2.txt, replace the name Hauschild with Housechild write the 
+#Duplicate the file from arguments to a new file called move2.txt, replace the name Hauschild with Housechild
 sed 's/Hauschild/Housechild/' move1.txt > move2.txt
 
 #Put the list of donors (only their full name, no other data) with area code 916 in a file called move3.txt
