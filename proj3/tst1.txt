@@ -1,0 +1,56 @@
+1. Find empty files>>>
+
+find . -type f -empty
+
+Delete empty files>>>
+
+find . -type f -empty -delete
+
+Find empty directories>>>
+
+find . -type d -empty
+
+Delete empty directories>>>
+
+find . -type d -empty -delete
+
+2. echo "Enter name of dir":
+
+read filename
+
+mkdir -p $filename
+
+for file in $(cat ~/path_to_file_containing_list_of_files); do mv "$file" $filename; done
+
+3. echo "Enter type of compression-> -z for gzip or -j for bzip2":
+
+read typecomp
+
+for file in $(cat ~/path_to_file_containing_list_of_files); do tar -zcvf file.tar.gz "$file" $typecomp; done
+
+4. echo "Enter the directory path to move to:"
+
+read dir
+
+if [[ ! -d $dir ]]; then
+
+echo "Wrong path, directory doesn't exist, try again"
+
+read dir
+
+else
+
+mv $dir
+
+fi
+
+trap "echo Goodbye..." SIGINT
+total=1
+
+while [ $total -le 3 ]; do
+
+        sleep 2
+
+        total=$(($total + 1))
+
+done
