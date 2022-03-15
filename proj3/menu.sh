@@ -1,10 +1,8 @@
 #!/bin/bash
-#January Johnson
-#Create a command line interface that will continually prompt a user for a command from a list to execute.
-#If the user enters option 6 or a  '|' or ctl+c the program will exit.
-
-#menu selection
-choice=0
+##bash script menu.sh
+##January Johnson
+##Create a command line interface that will continually prompt a user for a command from a list to execute.
+##If the user enters option 6 or a  '|' or ctl+c the program will exit.
 
 #exit function
 function exitProgram()
@@ -24,13 +22,17 @@ function exitProgram()
 trap exitProgram SIGINT
 
 
-#Perform commands until the user exits
-until [[ $choice = 6 ]]
-do
+function menu()
+{
     echo -e 'Select a command from the menu below by entering the corresponding number. Ex: 1.\n'
-
     #Command Menu
-    echo -e '1. List the files in the current directory \n2. List the number of empty directories in a directory.\n3. Navigate to another directory and list the files.\n4. Search for and the list the number of files that contain a specific word.\n5. Move specified files to a specific diretory.\n6. Exit.\n' 
+    echo -e '1. List the files in the current directory \n2. List the number of empty files in a directory.\n3. Navigate to another directory and list the files.\n4. Search for and the list the number of files that contain a specific word.\n5. Move specified files to a specific diretory.\n6. Exit.\n' 
+}
+
+#Perform commands until the user exits
+while [[ repeat ]]
+do
+    menu
     read choice
 
     #Check for '|' in input. Exit program if '|' entered
@@ -40,11 +42,10 @@ do
         total=1
         while [ $total -le 3 ]; do
                 echo . | tr '\n' ' '
-                sleep 2
+                sleep 1
                 total=$(($total + 1))
         done
         echo Goodbye
-        sleep 1
         exit 0
     else
 
@@ -54,18 +55,19 @@ do
             pwd
             echo
             echo -e 'Files in this directory are:'
-            ls -p | grep -v / | tr '\n' ' ' 
+            ls 
+            # -p | grep -v / | tr '\n' ' ' 
             echo
             echo
             ;;
 
         2)
-            echo -e 'Enter the directory. Enter 7 to go to the main menu.\n'
+            echo -e 'Enter the directory or path to a directory. Enter 7 to go to the main menu.\n'
             read dir
-            if [ $dir = 7 ]; then
+            if [ "$dir" == 7 ]; then
                     continue;
             fi
-            if [ ! -d "$dir" ]; then
+            if ! [[  -d "$dir" ]]; then
                 find $dir -type d 2>> logerr.txt
                 noDir=true
             fi
@@ -73,27 +75,30 @@ do
             do 
                 echo -e 'No such directory exist. Please, enter a directory. Enter 7 to go to the main menu.\n'
                 read dir
-                if [ $dir = 7 ]; then
+                if [ "$dir" == 7 ]; then
                     continue 2;
                 fi
-                if [ ! -d "$dir" ]; then
+                if ! [[  -d "$dir" ]]; then
                     find $dir -type d 2>> logerr.txt
                     noDir=true
                 else noDir=false
                 fi
             done
-            find $dir -empty -type d | wc -l
-            find $dir -empty -type d | tr '\n' ' ' 
+            echo -e 'There are' | tr '\n' ' '
+            find $dir -maxdepth 1 -empty -type f | wc -l | tr '\n' ' '
+            echo -e 'empty files in this directory:\n' 
+            find $dir -maxdepth 1 -empty -type f | tr '\n' ' ' 
+            echo 
             echo
             ;;
 
         3)
-            echo -e 'Enter the directory. Enter 7 to go to the main menu.\n'
+            echo -e 'Enter the directory or path to a directory. Enter 7 to go to the main menu.\n'
             read dir
-            if [ $dir = 7 ]; then
+            if [ "$dir" == 7 ]; then
                     continue;
             fi
-            if [ ! -d "$dir" ]; then
+            if ! [[ -d "$dir" ]]; then
                 find $dir -type d 2>> logerr.txt
                 noDir=true
             fi
@@ -101,36 +106,40 @@ do
             do 
                 echo -e 'No such directory exist. Please, enter a directory. Enter 7 to go to the main menu.\n'
                 read dir
-                if [ $dir = 7 ]; then
+                if [ "$dir" == 7 ]; then
                     continue 2;
                 fi
-                if [ ! -d "$dir" ]; then
+                if ! [[ -d "$dir" ]]; then
                     find $dir -type d 2>> logerr.txt
                     noDir=true
                 else noDir=false
                 fi
             done
-            cd $dir && ls -l
+            echo -e 'Files in this directory are:'
+            cd "$dir" && ls -l
             echo
             ;;
 
         4)
             echo -e 'Enter the word to look for.\n'
             read word
+            echo -e 'The number of files containing that word in this directory are:'
             grep -r -i -l "$word" * | wc -l
             echo
             ;;
 
         5)
-            echo -e 'Enter the name of the directory.\n'
+            echo -e 'Enter the name or path of the directory.\n'
             read dir
-            echo -e 'Enter the file(s) to move separated by a space. '
-            read files
-
-            mv $files $dir
-            
+            echo -e 'Enter the file(s) to move separated by a space.'
+            read -a files
+            for file in "${files[@]}"
+            do
+                echo moving file: $file to "$dir" directory
+                mv $file -t "$dir"
+            done   
             ;;
-            
+    
         6) 
             echo -e '\nExiting Program\n'
             sleep 1
